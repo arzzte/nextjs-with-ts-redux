@@ -1,35 +1,46 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { startClock, serverRenderClock } from '../domain/store'
-import Clock from '../components/clock'
+import React from 'react';
+import { connect } from 'react-redux';
+import { startClock, serverRenderClock, helloMessage, State } from '../domain/store';
+import Clock from '../components/clock';
 import { Dispatchable, mapDispatchToProps } from '../lib/with-redux-store';
 
-interface Props {}
+interface Props {
+  message: string;
+}
 
 class Index extends React.Component<Dispatchable<Props>> {
-  private timer: NodeJS.Timer
+  private timer: NodeJS.Timer;
 
-  static getInitialProps ({ reduxStore, req }) {
-    const isServer = !!req
-    reduxStore.dispatch(serverRenderClock(isServer))
+  static getInitialProps({ reduxStore, req }) {
+    const isServer = !!req;
+    reduxStore.dispatch(serverRenderClock(isServer));
 
-    return {}
+    return {};
   }
 
-  componentDidMount () {
-    const { dispatch } = this.props
-    this.timer = startClock(dispatch)
+  componentDidMount() {
+    const { dispatch } = this.props;
+    this.timer = startClock(dispatch);
+    dispatch(helloMessage('foo'));
   }
 
-  componentWillUnmount () {
-    clearInterval(this.timer)
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
-  render () {
+  render() {
     return (
-      <Clock />
-    )
+      <>
+        <Clock />
+        <div className="jej">{this.props.message}</div>
+      </>
+    );
   }
 }
 
-export default connect(null, mapDispatchToProps)(Index)
+const mapStateToProps = (state: State) => state;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Index);
